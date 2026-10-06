@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Inventra.IMS.Domain\Inventra.IMS.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

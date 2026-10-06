@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Inventra.IMS.Application\Inventra.IMS.Application.csproj" />
+  </ItemGroup>
+
 </Project>
