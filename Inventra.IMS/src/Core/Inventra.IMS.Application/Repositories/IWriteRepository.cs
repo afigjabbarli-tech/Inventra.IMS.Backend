@@ -8,6 +8,24 @@ namespace Inventra.IMS.Application.Repositories
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
     {
+        TEntity Add(TEntity entity);
 
+        Task<TEntity> AddAsync(
+            TEntity entity,
+            CancellationToken cancellationToken);
+
+        void AddRange(IEnumerable<TEntity> entities);
+
+        Task AddRangeAsync(
+            IEnumerable<TEntity> entities,
+            CancellationToken cancellationToken);
+
+        TEntity Update(TEntity entity);
+
+        void UpdateRange(IEnumerable<TEntity> entities);
+
+        void Remove(TEntity entity);
+
+        void RemoveRange(IEnumerable<TEntity> entities);
     }
 }
