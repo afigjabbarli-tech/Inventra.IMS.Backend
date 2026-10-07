@@ -10,7 +10,3 @@ namespace Inventra.IMS.Application.Repositories
 
     }
 }
-
-
-
-//new()-nun ne oldughunu sorush,  IEquatable<TKey> ne oldughunu sorush...
