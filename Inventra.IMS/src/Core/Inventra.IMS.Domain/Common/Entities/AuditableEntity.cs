@@ -7,12 +7,12 @@ namespace Inventra.IMS.Domain.Common.Entities
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
     {
-        public TKey? CreatedBy { get; private set; }
+        public TKey? CreatedBy { get; set; }
 
-        public TDate CreatedAt { get; private set; }
+        public TDate CreatedAt { get; set; }
 
-        public TKey? LastModifiedBy { get; private set; }
+        public TKey? LastModifiedBy { get; set; }
 
-        public TDate? LastModifiedAt { get; private set; }
+        public TDate? LastModifiedAt { get; set; }
     }
 }

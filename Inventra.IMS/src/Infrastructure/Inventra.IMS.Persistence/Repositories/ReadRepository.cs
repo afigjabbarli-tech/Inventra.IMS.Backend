@@ -12,6 +12,7 @@ namespace Inventra.IMS.Persistence.Repositories
         where TEntity : SoftDeletableEntity<TKey, TDate>, new()
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
+
     {
         public ReadRepository(InventraDbContext inventraDbContext)
             : base(inventraDbContext) { }

@@ -4,8 +4,8 @@
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
     {
-        bool IsDeleted { get; }
-        TDate? DeletedAt { get; }
-        TKey? DeletedBy { get; }
+        bool IsDeleted { get; set; }
+        TDate? DeletedAt { get; set; }
+        TKey? DeletedBy { get; set; }
     }
 }

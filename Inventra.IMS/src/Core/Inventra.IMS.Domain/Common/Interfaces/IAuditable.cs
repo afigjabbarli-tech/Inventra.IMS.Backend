@@ -4,9 +4,9 @@
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
     {
-        TKey? CreatedBy { get; }
-        TDate CreatedAt { get; }
-        TKey? LastModifiedBy { get; }
-        TDate? LastModifiedAt { get; }
+        TKey? CreatedBy { get; set; }
+        TDate CreatedAt { get; set; }
+        TKey? LastModifiedBy { get; set; }
+        TDate? LastModifiedAt { get; set; }
     }
 }

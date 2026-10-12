@@ -14,9 +14,9 @@ namespace Inventra.IMS.Persistence.Repositories
 
         protected DbSet<TEntity> Table => Context.Set<TEntity>();
 
-        protected Repository(DbContext context)
+        protected Repository(DbContext dbContext)
         {
-            Context = context;
+            Context = dbContext;
         }
 
         protected IQueryable<TEntity> Query(bool isTracking)

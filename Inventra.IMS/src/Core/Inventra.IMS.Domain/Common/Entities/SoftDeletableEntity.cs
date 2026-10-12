@@ -7,10 +7,10 @@ namespace Inventra.IMS.Domain.Common.Entities
         where TKey : struct, IEquatable<TKey>
         where TDate : struct
     {
-        public bool IsDeleted { get; private set; }
+        public bool IsDeleted { get; set; }
 
-        public TDate? DeletedAt { get; private set; }
+        public TDate? DeletedAt { get; set; }
 
-        public TKey? DeletedBy { get; private set; }
+        public TKey? DeletedBy { get; set; }
     }
 }
