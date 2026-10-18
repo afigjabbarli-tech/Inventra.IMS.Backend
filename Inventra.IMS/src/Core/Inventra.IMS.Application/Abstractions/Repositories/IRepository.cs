@@ -1,0 +1,12 @@
+﻿using Inventra.IMS.Domain.Common.Entities;
+
+namespace Inventra.IMS.Application.Abstractions.Repositories
+{
+    public interface IRepository<TEntity, TKey, TDate>
+        where TEntity : SoftDeletableEntity<TKey, TDate>, new()
+        where TKey : struct, IEquatable<TKey>
+        where TDate : struct
+    {
+
+    }
+}
