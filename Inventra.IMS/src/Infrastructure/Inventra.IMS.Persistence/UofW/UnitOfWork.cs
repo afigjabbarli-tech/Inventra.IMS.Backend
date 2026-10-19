@@ -1,6 +1,10 @@
 ﻿using Inventra.IMS.Application.Abstractions.Repositories.Country;
+using Inventra.IMS.Application.Abstractions.Repositories.FileAttachment;
+using Inventra.IMS.Application.Abstractions.Repositories.FileMetadata;
 using Inventra.IMS.Application.UofW;
 using Inventra.IMS.Persistence.Concretes.Repositories.Country;
+using Inventra.IMS.Persistence.Concretes.Repositories.FileAttachment;
+using Inventra.IMS.Persistence.Concretes.Repositories.FileMetadata;
 using Inventra.IMS.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -12,6 +16,10 @@ namespace Inventra.IMS.Persistence.UofW
 
         private ICountryReadRepository? _countryReadRepository;
         private ICountryWriteRepository? _countryWriteRepository;
+        private IFileMetadataReadRepository? _fileMetadataReadRepository;
+        private IFileMetadataWriteRepository? _fileMetadataWriteRepository;
+        private IFileAttachmentReadRepository? _fileAttachmentReadRepository;
+        private IFileAttachmentWriteRepository? _fileAttachmentWriteRepository;
 
         private IDbContextTransaction? _transaction;
 
@@ -25,6 +33,14 @@ namespace Inventra.IMS.Persistence.UofW
         public ICountryReadRepository CountryReadRepository => _countryReadRepository ??= new CountryReadRepository(_context);
 
         public ICountryWriteRepository CountryWriteRepository => _countryWriteRepository ??= new CountryWriteRepository(_context);
+
+        public IFileMetadataReadRepository FileMetadataReadRepository => _fileMetadataReadRepository ??= new FileMetadataReadRepository(_context);
+
+        public IFileMetadataWriteRepository FileMetadataWriteRepository => _fileMetadataWriteRepository ??= new FileMetadataWriteRepository(_context);
+
+        public IFileAttachmentReadRepository FileAttachmentReadRepository => _fileAttachmentReadRepository ??= new FileAttachmentReadRepository(_context);
+
+        public IFileAttachmentWriteRepository FileAttachmentWriteRepository => _fileAttachmentWriteRepository ??= new FileAttachmentWriteRepository(_context);
 
         public void BeginTransaction()
         {

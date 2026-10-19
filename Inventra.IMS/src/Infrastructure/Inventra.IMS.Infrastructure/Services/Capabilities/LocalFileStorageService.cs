@@ -192,12 +192,12 @@ namespace Inventra.IMS.Infrastructure.Services.Capabilities
                 nameof(rootDirectoryPath));
             }
 
-            if (length < 16)
+            if (length < 32)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(length),
                     length,
-                    "File name length must be at least 16 characters.");
+                    "File name length must be at least 32 characters.");
             }
 
             string uniqueFileIdentifier;

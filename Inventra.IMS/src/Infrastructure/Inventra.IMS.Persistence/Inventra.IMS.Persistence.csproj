@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Concretes\Repositories\FileAttachment\" />
-    <Folder Include="Concretes\Repositories\FileMetadata\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

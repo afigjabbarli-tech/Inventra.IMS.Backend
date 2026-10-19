@@ -1,4 +1,6 @@
 ﻿using Inventra.IMS.Application.Abstractions.Repositories.Country;
+using Inventra.IMS.Application.Abstractions.Repositories.FileAttachment;
+using Inventra.IMS.Application.Abstractions.Repositories.FileMetadata;
 
 namespace Inventra.IMS.Application.UofW
 {
@@ -6,7 +8,10 @@ namespace Inventra.IMS.Application.UofW
     {
         ICountryReadRepository CountryReadRepository { get; }
         ICountryWriteRepository CountryWriteRepository { get; }
-
+        IFileMetadataReadRepository FileMetadataReadRepository { get; }
+        IFileMetadataWriteRepository FileMetadataWriteRepository { get; }
+        IFileAttachmentReadRepository FileAttachmentReadRepository { get; }
+        IFileAttachmentWriteRepository FileAttachmentWriteRepository { get; }
         int SaveChanges();
 
         Task<int> SaveChangesAsync(
