@@ -282,6 +282,11 @@ namespace Inventra.IMS.Persistence.Migrations
                         .HasColumnName("extension")
                         .HasColumnOrder(12);
 
+                    b.Property<int>("FileCategory")
+                        .HasColumnType("integer")
+                        .HasColumnName("file_category")
+                        .HasColumnOrder(16);
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted")

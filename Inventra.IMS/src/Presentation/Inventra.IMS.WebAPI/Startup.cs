@@ -7,7 +7,8 @@ namespace Inventra.IMS.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public Startup(IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment)
         {
             Configuration = configuration;
             WebHostEnvironment = webHostEnvironment;
@@ -32,9 +33,14 @@ namespace Inventra.IMS.WebAPI
 
             Directory.CreateDirectory(uploadRootPath);
 
+            serviceDescriptors.AddHttpContextAccessor();
+
             serviceDescriptors.AddApplicationServices();
             serviceDescriptors.AddPersistenceServices(connectionString);
-            serviceDescriptors.AddInfrastructureServices(uploadRootPath);
+            serviceDescriptors.AddInfrastructureServices(
+                uploadRootPath,
+                serviceDescriptors.BuildServiceProvider()
+                    .GetRequiredService<IHttpContextAccessor>());
 
             serviceDescriptors.AddControllers();
 
@@ -56,6 +62,8 @@ namespace Inventra.IMS.WebAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

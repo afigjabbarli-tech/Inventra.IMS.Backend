@@ -2,6 +2,7 @@
 using Inventra.IMS.Application.Models.File;
 using Inventra.IMS.Domain.Enums;
 using Inventra.IMS.Infrastructure.Mappings;
+using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -10,7 +11,11 @@ namespace Inventra.IMS.Infrastructure.Services.Capabilities
     public class LocalFileStorageService : IFileStorageService
     {
         private readonly string _rootPath;
-        public LocalFileStorageService(string rootPath)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public LocalFileStorageService(
+            string rootPath,
+            IHttpContextAccessor httpContextAccessor)
         {
             if (string.IsNullOrWhiteSpace(rootPath))
             {
@@ -20,7 +25,11 @@ namespace Inventra.IMS.Infrastructure.Services.Capabilities
             }
 
             _rootPath = Path.GetFullPath(rootPath);
+
+            _httpContextAccessor = httpContextAccessor
+                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
+
         public async Task<FileStorageResult> UploadAsync(FileUploadParameters parameters,
             int length, CancellationToken cancellationToken)
         {
@@ -132,6 +141,86 @@ namespace Inventra.IMS.Infrastructure.Services.Capabilities
                 FileCategory = parameters.FileCategory,
                 StorageProvider = StorageProvider.Local
             };
+        }
+
+        public string GeneratePublicURL(string storageKey)
+        {
+            if (string.IsNullOrWhiteSpace(storageKey))
+            {
+                throw new ArgumentException(
+                    "Storage key cannot be null or empty!",
+                    nameof(storageKey));
+            }
+
+            string normalizedKey = storageKey.Replace('\\', '/');
+
+            string[] segments = normalizedKey.Split('/');
+
+            if (segments.Any(segment =>
+                string.IsNullOrWhiteSpace(segment) ||
+                segment == "." ||
+                segment == ".."))
+            {
+                throw new ArgumentException(
+                    "Invalid storage key!",
+                    nameof(storageKey));
+            }
+
+            string encodedStorageKey = string.Join(
+                "/",
+                segments.Select(Uri.EscapeDataString));
+
+            string baseUrl = GetBaseURL(_httpContextAccessor);
+
+            return $"{baseUrl}/uploads/{encodedStorageKey}";
+        }
+
+        public void Delete(string storageKey)
+        {
+            if (string.IsNullOrWhiteSpace(storageKey))
+            {
+                throw new ArgumentException(
+                    "Storage key cannot be null or empty!",
+                    nameof(storageKey));
+            }
+
+            string normalizedKey = storageKey.Replace('\\', '/');
+
+            string[] segments = normalizedKey.Split('/');
+
+            if (segments.Any(segment =>
+                string.IsNullOrWhiteSpace(segment) ||
+                segment == "." ||
+                segment == ".."))
+            {
+                throw new ArgumentException(
+                    "Invalid storage key!",
+                    nameof(storageKey));
+            }
+
+            string filePath = Path.GetFullPath(
+                Path.Combine(
+                    _rootPath,
+                    normalizedKey.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar)));
+
+            string relativePath = Path.GetRelativePath(
+                _rootPath,
+                filePath);
+
+            if (Path.IsPathRooted(relativePath) ||
+                relativePath == ".." ||
+                relativePath.StartsWith(
+                    ".." + Path.DirectorySeparatorChar,
+                    StringComparison.Ordinal))
+            {
+                throw new ArgumentException(
+                    "Storage key points outside the storage root!",
+                    nameof(storageKey));
+            }
+
+            File.Delete(filePath);
         }
 
         private string GenerateFileDirectoryPath(string rootDirectoryPath,
@@ -292,6 +381,19 @@ namespace Inventra.IMS.Infrastructure.Services.Capabilities
         private int GenerateRandomNumber(int minValue, int maxValue)
         {
             return Random.Shared.Next(minValue, maxValue);
+        }
+
+        private string GetBaseURL(IHttpContextAccessor httpContextAccessor)
+        {
+            var request = _httpContextAccessor.HttpContext?.Request;
+
+            if(request is null)
+            {
+                throw new InvalidOperationException(
+                 "HTTP context is not available!");
+            }
+
+            return $"{request.Scheme}://{request.Host}{request.PathBase}";
         }
     }
 }

@@ -6,5 +6,8 @@ namespace Inventra.IMS.Application.Abstractions.Capabilities
     {
         Task<FileStorageResult> UploadAsync(FileUploadParameters parameters,
             int length, CancellationToken cancellationToken);
+        string GeneratePublicURL(string storageKey);
+
+        void Delete(string storageKey);
     }
 }

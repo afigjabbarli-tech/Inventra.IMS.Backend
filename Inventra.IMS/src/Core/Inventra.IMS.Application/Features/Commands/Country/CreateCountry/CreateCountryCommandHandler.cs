@@ -1,5 +1,6 @@
 ﻿using Inventra.IMS.Application.Abstractions.Capabilities;
 using Inventra.IMS.Application.Abstractions.Services;
+using Inventra.IMS.Application.DTOs.Country;
 using Inventra.IMS.Application.DTOs.FileAttachment;
 using Inventra.IMS.Application.DTOs.FileMetadata;
 using Inventra.IMS.Application.Extensions;
@@ -32,13 +33,14 @@ namespace Inventra.IMS.Application.Features.Commands.Country.CreateCountry
             CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            string storageKey = string.Empty;
 
             try
             {
                 var countryGetDTO = await _countryService
                 .CreateCountryAsync(request.CountryPostDTO, cancellationToken);
 
-                IFormFile file = request.CountryFlagUploadDTO.flag;
+                IFormFile file = request.CountryFlagPostDTO.flag;
 
                 var fileCategory = FileCategoryExtensions
                     .ToFileCategory(file);
@@ -55,11 +57,13 @@ namespace Inventra.IMS.Application.Features.Commands.Country.CreateCountry
                     await _fileStorageService.UploadAsync(parameters,
                     64, cancellationToken);
 
+                storageKey = fileStorageResult.StorageKey;
+
                 var fileMetadataCreateDTO = new FileMetadataCreateDTO
                 {
                     OriginalFileName = fileStorageResult.OriginalFileName,
                     StoredFileName = fileStorageResult.StorageFileName,
-                    StorageKey = fileStorageResult.StorageKey,
+                    StorageKey = storageKey,
                     ContentType = fileStorageResult.ContentType,
                     Extension = fileStorageResult.Extension,
                     SizeBytes = fileStorageResult.SizeBytes,
@@ -77,18 +81,49 @@ namespace Inventra.IMS.Application.Features.Commands.Country.CreateCountry
                     OwnerType = EntityType.Country,
                     OwnerUid = countryGetDTO.uid,
                     FilePurpose = FilePurpose.OptionImage,
-                    SortOrder = request.CountryFlagUploadDTO.sort_order,
-                    IsPrimary = request.CountryFlagUploadDTO.is_primary
+                    SortOrder = request.CountryFlagPostDTO.sort_order,
+                    IsPrimary = request.CountryFlagPostDTO.is_primary
                 };
 
                 var fileAttachmentReadDTO = await _fileAttachmentService
                     .CreateFileAttachmentAsync(fileAttachmentCreateDTO, cancellationToken);
 
-                return new CreateCountryCommandResponse { };
+                var countryFlagPublicURL = _fileStorageService
+                    .GeneratePublicURL(fileMetadataReadDTO.storage_key);
+
+                var countryFlagGetDTO = new CountryFlagGetDTO
+                {
+                    original_file_name = fileMetadataReadDTO.original_file_name,
+                    file_purpose = fileAttachmentReadDTO.file_purpose,
+                    is_primary = fileAttachmentReadDTO.is_primary,
+                    sort_order = fileAttachmentReadDTO.sort_order,
+                    file_category = fileMetadataReadDTO.file_category,
+                    url = countryFlagPublicURL,
+                    file_attachment_uid = fileAttachmentReadDTO.uid
+                };
+
+                var countryWithFlagGetDTO = new CountryWithFlagGetDTO
+                {
+                    country = countryGetDTO,
+                    flag = countryFlagGetDTO
+                };
+
+                var createCountryCommandResponse = new CreateCountryCommandResponse
+                {
+                    country_data = countryWithFlagGetDTO
+                };
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                return createCountryCommandResponse;
             }
-            catch
+            catch(Exception)
             {
                 await _unitOfWork.RollbackTransactionAsync(CancellationToken.None);
+
+                _fileStorageService.Delete(storageKey);
 
                 throw;
             }

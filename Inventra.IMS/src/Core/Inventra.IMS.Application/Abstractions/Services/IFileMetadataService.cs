@@ -6,5 +6,11 @@ namespace Inventra.IMS.Application.Abstractions.Services
     {
         Task<FileMetadataReadDTO> CreateFileMetadataAsync(FileMetadataCreateDTO fileMetadataCreateDTO,
             CancellationToken cancellationToken);
+
+        Task<FileMetadataReadDTO> GetFileMetadataByUidAsync(Guid uid, 
+            bool isTracking, CancellationToken cancellationToken);
+
+        Task DeleteFileMetadataByUidAsync(Guid uid,
+            bool isTracking, CancellationToken cancellationToken);
     }
 }

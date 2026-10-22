@@ -20,7 +20,6 @@
   <ItemGroup>
     <Folder Include="Abstractions\Integrations\" />
     <Folder Include="Common\Behaviors\" />
-    <Folder Include="Features\Queries\" />
   </ItemGroup>
 
 </Project>

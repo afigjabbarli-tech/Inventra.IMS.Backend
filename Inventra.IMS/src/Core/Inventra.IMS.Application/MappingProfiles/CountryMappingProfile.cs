@@ -89,6 +89,14 @@ namespace Inventra.IMS.Application.MappingProfiles
                     opt => opt.MapFrom(src => src.CreatedBy))
                 .ForMember(dest => dest.last_modified_by,
                     opt => opt.MapFrom(src => src.LastModifiedBy));
+
+            CreateMap<Country, CountryOptionDTO>()
+                .ForMember(dest => dest.uid,
+                    opt => opt.MapFrom(src => src.Uid))
+                .ForMember(dest => dest.common_name,
+                    opt => opt.MapFrom(src => src.CommonName))
+                .ForMember(dest => dest.phone_code,
+                    opt => opt.MapFrom(src => src.PhoneCode));
         }
     }
 }

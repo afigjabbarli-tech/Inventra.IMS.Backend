@@ -279,7 +279,7 @@ namespace Inventra.IMS.Application.Validations.Country
                     .WithMessage(
                         "'{PropertyName}' mənfi ola bilməz!");
 
-            RuleFor(request => request.CountryFlagUploadDTO.flag)
+            RuleFor(request => request.CountryFlagPostDTO.flag)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
                     .WithSeverity(Severity.Error)
@@ -307,7 +307,7 @@ namespace Inventra.IMS.Application.Validations.Country
                     .WithMessage(
                         "'{PropertyName}' yalnız SVG və ya PNG formatında olmalıdır!");
 
-            RuleFor(request => request.CountryFlagUploadDTO.sort_order)
+            RuleFor(request => request.CountryFlagPostDTO.sort_order)
                 .GreaterThanOrEqualTo(1)
                     .WithSeverity(Severity.Error)
                     .WithErrorCode("Localization zamani tetbiq et!")

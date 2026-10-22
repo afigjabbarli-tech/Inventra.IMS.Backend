@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Inventra.IMS.Application.Abstractions.Services;
 using Inventra.IMS.Application.Common.Exceptions;
 using Inventra.IMS.Application.DTOs.Country;
 using Inventra.IMS.Application.UofW;
 using Inventra.IMS.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventra.IMS.Persistence.Concretes.Services
 {
@@ -18,7 +20,8 @@ namespace Inventra.IMS.Persistence.Concretes.Services
             _mapper = mapper;
         }
 
-        public async Task<CountryGetDTO> CreateCountryAsync(CountryPostDTO countryPostDTO, CancellationToken cancellationToken)
+        public async Task<CountryGetDTO> CreateCountryAsync(CountryPostDTO countryPostDTO,
+            CancellationToken cancellationToken)
         {
             if (await _unitOfWork.CountryReadRepository
                 .ExistAsync(
@@ -64,6 +67,61 @@ namespace Inventra.IMS.Persistence.Concretes.Services
             var countryGetDTO = _mapper.Map<CountryGetDTO>(addedCountry);
 
             return countryGetDTO;
+        }
+
+        public async Task<CountryGetDTO> GetCountryByUidAsync(Guid uid,
+            bool isTarcking, CancellationToken cancellationToken)
+        {
+            var country = await _unitOfWork.CountryReadRepository
+                .GetByUidAsync(uid, isTarcking, cancellationToken);
+
+            if (country is null)
+            {
+                throw new NotFoundException(
+                $"Country with UID '{uid}' was not found!");
+            }
+
+            var countryGetDTO = _mapper.Map<CountryGetDTO>(country);
+
+            return countryGetDTO;
+        }
+
+        public async Task DeleteCountryByUidAsync(Guid uid, 
+            bool isTracking, CancellationToken cancellationToken)
+        {
+            var country = await _unitOfWork.CountryReadRepository
+                .GetByUidAsync(uid, isTracking, cancellationToken);
+
+            if(country is null)
+            {
+                throw new NotFoundException(
+                $"Country with UID '{uid}' was not found!");
+            }
+
+            _unitOfWork.CountryWriteRepository.Remove(country);
+        }
+
+        public async Task<List<CountryGetDTO>> GetAllCountriesAsync(
+        bool isTracking,
+        CancellationToken cancellationToken)
+        {
+            var countriesGetDTO = await _unitOfWork.CountryReadRepository
+                .GetAllAsQueryable(isTracking)
+                .ProjectTo<CountryGetDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            return countriesGetDTO;
+        }
+
+        public async Task<List<CountryOptionDTO>> GetCountryOptionsAsync(bool isTracking,
+        CancellationToken cancellationToken)
+        {
+            var countryOptionsDTO = await _unitOfWork.CountryReadRepository
+                .GetAllAsQueryable(isTracking)
+                .ProjectTo<CountryOptionDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            return countryOptionsDTO;
         }
     }
 }

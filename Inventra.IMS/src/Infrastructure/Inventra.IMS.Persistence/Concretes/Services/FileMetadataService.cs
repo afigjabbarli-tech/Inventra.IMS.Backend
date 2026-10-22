@@ -1,6 +1,6 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Inventra.IMS.Application.Abstractions.Services;
+using Inventra.IMS.Application.Common.Exceptions;
 using Inventra.IMS.Application.DTOs.FileMetadata;
 using Inventra.IMS.Application.UofW;
 using Inventra.IMS.Domain.Entities;
@@ -28,6 +28,39 @@ namespace Inventra.IMS.Persistence.Concretes.Services
             var fileMetadataReadDTO = _mapper.Map<FileMetadataReadDTO>(addedFileMetadata);
 
             return fileMetadataReadDTO;
+        }
+
+        public async Task<FileMetadataReadDTO> GetFileMetadataByUidAsync(Guid uid,
+            bool isTracking, CancellationToken cancellationToken)
+        {
+            var fileMetadata = await _unitOfWork.FileMetadataReadRepository
+                .GetByUidAsync(uid, isTracking, cancellationToken);
+
+            if(fileMetadata is null)
+            {
+                throw new NotFoundException(
+                $"File metadata with UID '{uid}' was not found!");
+            }
+
+            var fileMetadataReadDTO = _mapper.Map<FileMetadataReadDTO>(fileMetadata);
+
+            return fileMetadataReadDTO;
+        }
+
+        public async Task DeleteFileMetadataByUidAsync(Guid uid,
+            bool isTracking, CancellationToken cancellationToken)
+        {
+            var fileMetadata = await _unitOfWork.FileMetadataReadRepository
+                .GetByUidAsync (uid, isTracking, cancellationToken);
+
+            if (fileMetadata is null)
+            {
+                throw new NotFoundException(
+                $"File metadata with UID '{uid}' was not found!");
+            }
+
+            _unitOfWork.FileMetadataWriteRepository
+                .Remove(fileMetadata);
         }
     }
 }

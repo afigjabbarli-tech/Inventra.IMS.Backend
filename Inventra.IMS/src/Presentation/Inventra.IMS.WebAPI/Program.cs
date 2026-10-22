@@ -12,6 +12,11 @@ namespace Inventra.IMS.WebAPI
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureServices(services =>
+                    {
+                        services.AddHttpContextAccessor();
+                    });
+
                     webBuilder.UseStartup<Startup>();
                 });
     }

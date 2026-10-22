@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Inventra.IMS.Application.Abstractions.Services;
+using Inventra.IMS.Application.Common.Exceptions;
 using Inventra.IMS.Application.DTOs.FileAttachment;
 using Inventra.IMS.Application.UofW;
 using Inventra.IMS.Domain.Entities;
+using Inventra.IMS.Domain.Enums;
 
 namespace Inventra.IMS.Persistence.Concretes.Services
 {
@@ -27,6 +29,49 @@ namespace Inventra.IMS.Persistence.Concretes.Services
             var fileAttachmentReadDTO = _mapper.Map<FileAttachmentReadDTO>(addedFileAttachment);
 
             return fileAttachmentReadDTO;
+        }
+
+        public async Task<FileAttachmentReadDTO> GetFileAttachmentByOwnerAsync(
+            EntityType ownerType, Guid ownerUid,
+            bool isTarcking, CancellationToken cancellationToken)
+        {
+            var fileAttachment = await _unitOfWork.FileAttachmentReadRepository
+                .GetByConditionAsync((fileAttachment)
+                => fileAttachment.OwnerType.Equals(ownerType)
+                && fileAttachment.OwnerUid.Equals(ownerUid),
+                isTarcking, cancellationToken);
+
+            if(fileAttachment is null)
+            {
+                throw new NotFoundException(
+                $"File attachment for owner type '{ownerType}'" +
+                $" with UID '{ownerUid}' was not found!");
+            }
+
+            var fileAttachmentReadDTO = _mapper
+                .Map<FileAttachmentReadDTO>(fileAttachment);
+
+            return fileAttachmentReadDTO;
+        }
+
+        public async Task DeleteFileAttachmentByOwnerAsync(
+            EntityType ownerType, Guid ownerUid,
+            bool isTarcking, CancellationToken cancellationToken)
+        {
+            var fileAttachment = await _unitOfWork.FileAttachmentReadRepository
+                .GetByConditionAsync((fileAttachment)
+                => fileAttachment.OwnerType.Equals(ownerType)
+                && fileAttachment.OwnerUid.Equals(ownerUid),
+                isTarcking, cancellationToken);
+
+            if (fileAttachment is null)
+            {
+                throw new NotFoundException(
+                $"File attachment for owner type '{ownerType}'" +
+                $" with UID '{ownerUid}' was not found!");
+            }
+
+            _unitOfWork.FileAttachmentWriteRepository.Remove(fileAttachment);
         }
     }
 }

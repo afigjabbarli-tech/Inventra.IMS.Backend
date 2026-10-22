@@ -26,8 +26,6 @@
         public string? demonym { get; set; }
         public decimal? gdp { get; set; }
 
-        public string flag_url { get; set; } = string.Empty;
-
         public double? population_density { get; set; }
         public decimal? gdp_per_capita { get; set; }
 
